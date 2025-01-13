@@ -11,8 +11,6 @@ import (
 	"github.com/sashabaranov/go-openai"
 )
 
-var ()
-
 func main() {
 	// 加载环境变量
 	apiKey := os.Getenv("OPENAI_API_KEY")
@@ -75,4 +73,5 @@ func main() {
 			}
 		}
 	}
+	fmt.Println("")
 }

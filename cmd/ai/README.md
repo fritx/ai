@@ -9,6 +9,11 @@ export OPENAI_API_KEY="sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 export OPENAI_API_BASE_URL="https://api.siliconflow.cn/v1"
 export OPENAI_API_MODEL="Qwen/Qwen2.5-7B-Instruct"  # 免费
 
+# ...其他平台示例
+# - 如 通义千问API: https://help.aliyun.com/zh/model-studio/getting-started/first-api-call-to-qwen
+export OPENAI_API_BASE_URL="https://dashscope.aliyuncs.com/compatible-mode/v1"
+export OPENAI_API_MODEL="qwen-turbo"  # 含一定的免费额度
+
 ai "你是什么模型"
 >> 我是Qwen模型，由阿里巴巴云开发。作为一个预训练语言模型，我能够生成与给定词语相关的文本，帮助回答问题、撰写文章等多种自然语言处理任务。如果您有任何问题或需要帮助，请随时告诉我！
 
