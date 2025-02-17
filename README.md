@@ -17,53 +17,61 @@ ai "你是什么模型"
 
 ### API用法：
 
-**客户端初始化：ai.Setup**
+**客户端创建：ai.New / ai.NewFromEnv**
 
 ```go
 import "gitee.com/fritx/ai"
 
-if err := ai.Setup(); err != nil {
-	log.Fatalf("Failed to setup AI client: %v\n", err)
-}
-// ...
+client, err := ai.New(apiKey, baseUrl, model)
+
+// or 从环境变量读取配置
+client, err := ai.NewFromEnv()
 ```
 
-**普通调用：ai.Chat**
+**长上下文对话：ai.Chat / ai.ChatStream**
+
+```go
+import "github.com/sashabaranov/go-openai"
+
+response, err := ai.Chat(ctx, []openai.ChatCompletionMessage{
+	{Role: openai.ChatMessageRoleSystem, Content: "..."},
+	{Role: openai.ChatMessageRoleUser, Content: "..."},
+	{Role: openai.ChatMessageRoleAssistant, Content: "..."},
+	{Role: openai.ChatMessageRoleUser, Content: "..."},
+})
+
+// or 发起流式请求
+stream, err := ai.ChatStream(ctx, []openai.ChatCompletionMessage{
+	{Role: openai.ChatMessageRoleAssistant, Content: "..."},
+	{Role: openai.ChatMessageRoleUser, Content: "..."},
+})
+defer stream.Close()
+````
+
+**一次性对话：ai.ChatOnce / ai.ChatStreamOnce**
 
 ```go
 prompt := "中国大模型行业2025年将会迎来哪些机遇和挑战"
 
-response, err := ai.Chat(context.TODO(), prompt)
+response, err := ai.ChatOnce(ctx, prompt)
 if err != nil {
-	log.Fatalf("Error creating chat completion stream: %v\n", err)
+	// ...
 }
 fmt.Println(response.Choices[0].Message)
-```
 
-**流式读取：ai.ChatStream**
-
-```go
-prompt := "中国大模型行业2025年将会迎来哪些机遇和挑战"
-
-stream, err := ai.ChatStream(context.TODO(), prompt)
+// or 发起流式请求
+stream, err := ai.ChatStreamOnce(ctx, prompt)
 if err != nil {
-	log.Fatalf("Error creating chat completion stream: %v\n", err)
+	// ...
 }
 defer stream.Close()
 
 // 读取流响应
-for {
-	response, err := stream.Recv()
-	if err != nil {
-		break // 结束流
-	}
-	if response.Choices != nil && len(response.Choices) > 0 {
-		delta := response.Choices[0].Delta
-		// if delta.Content != nil {
-		if delta.Content != "" {
-			fmt.Print(delta.Content)
-		}
-	}
+err = ai.StreamLoop(stream, func(s string) {
+	fmt.Print(s)
+})
+fmt.Print("\n")
+if err != nil {
+	log.Fatalf("** Error: %v\n", err)
 }
-fmt.Println("")
 ```
