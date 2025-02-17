@@ -5,27 +5,15 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"os"
 	"strings"
 
-	"github.com/sashabaranov/go-openai"
+	"gitee.com/fritx/ai"
 )
 
 func main() {
-	// 加载环境变量
-	apiKey := os.Getenv("OPENAI_API_KEY")
-	if apiKey == "" {
-		log.Fatal("OPENAI_API_KEY environment variable is not set")
+	if err := ai.Setup(); err != nil {
+		log.Fatalf("Failed to setup AI client: %v\n", err)
 	}
-	baseUrl := os.Getenv("OPENAI_API_BASE_URL")
-	if baseUrl == "" {
-		log.Fatal("OPENAI_API_BASE_URL environment variable is not set")
-	}
-	model := os.Getenv("OPENAI_API_MODEL")
-	if model == "" {
-		log.Fatal("OPENAI_API_MODEL environment variable is not set")
-	}
-
 	// 解析flags
 	flag.Parse()
 
@@ -36,24 +24,8 @@ func main() {
 		log.Fatal("prompt variable is not set")
 	}
 
-	// 创建一个新的OpenAI客户端
-	// client := openai.NewClientWithBaseURL(apiKey, "https://api.siliconflow.cn/v1")
-	config := openai.DefaultConfig(apiKey)
-	config.BaseURL = baseUrl
-	client := openai.NewClientWithConfig(config)
-
-	// 设置请求参数
-	req := openai.ChatCompletionRequest{
-		Model: model,
-		// Messages: []openai.ChatMessage{
-		Messages: []openai.ChatCompletionMessage{
-			{Role: openai.ChatMessageRoleUser, Content: prompt},
-		},
-		Stream: true,
-	}
-
 	// 发起流式请求
-	stream, err := client.CreateChatCompletionStream(context.Background(), req)
+	stream, err := ai.ChatStream(context.Background(), prompt)
 	if err != nil {
 		log.Fatalf("Error creating chat completion stream: %v\n", err)
 	}

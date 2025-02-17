@@ -1,4 +1,4 @@
-module gitee.com/fritx/ai/cmd/ai
+module gitee.com/fritx/ai
 
 go 1.21
 
